@@ -1,0 +1,268 @@
+{
+  "@odata.context": "https://vs-end-sub-aisearch.search.windows.net/$metadata#skillsets/$entity",
+  "@odata.etag": "\"0x8DCC7890216468E\"",
+  "name": "scij-skillsets",
+  "description": "Skillset for enriching documents",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Custom.WebApiSkill",
+      "name": "SCIContentExtraction",
+      "description": "Extract content from supreme court escr portal",
+      "context": "/document",
+      "uri": "https://sci-genai-python-skills.azurewebsites.net/enrichment/ExtractContentSCIJ?code=nDOujc9N0-4bTsUVkGv5JKBFoKnb3HfOzUPLAAfKhrYSAzFuvfrn1w%3D%3D",
+      "httpMethod": "POST",
+      "timeout": "PT3M",
+      "batchSize": 5,
+      "degreeOfParallelism": null,
+      "authResourceId": null,
+      "inputs": [
+        {
+          "name": "metadata_storage_path",
+          "source": "/document/metadata_storage_path"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ExtractedContent",
+          "targetName": "ExtractedContent"
+        }
+      ],
+      "httpHeaders": {},
+      "authIdentity": null
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Custom.WebApiSkill",
+      "name": "SCICuratedMetadataExtraction",
+      "description": "Assign metadata from json extracted from curated metadata from supreme court escr portal",
+      "context": "/document",
+      "uri": "https://sci-genai-python-skills.azurewebsites.net/enrichment/ExtractCuratedMetaDataSCIJ?code=nDOujc9N0-4bTsUVkGv5JKBFoKnb3HfOzUPLAAfKhrYSAzFuvfrn1w%3D%3D",
+      "httpMethod": "POST",
+      "timeout": "PT3M",
+      "batchSize": 5,
+      "degreeOfParallelism": null,
+      "authResourceId": null,
+      "inputs": [
+        {
+          "name": "metadata_storage_path",
+          "source": "/document/metadata_storage_path"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "curatedMetaData",
+          "targetName": "curatedMetaData"
+        }
+      ],
+      "httpHeaders": {},
+      "authIdentity": null
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Custom.WebApiSkill",
+      "name": "SCISummaryExtraction",
+      "description": "Extract summary from supreme court escr portal",
+      "context": "/document",
+      "uri": "https://sci-genai-python-skills.azurewebsites.net/enrichment/ExtractSummarySCIJ?code=nDOujc9N0-4bTsUVkGv5JKBFoKnb3HfOzUPLAAfKhrYSAzFuvfrn1w%3D%3D",
+      "httpMethod": "POST",
+      "timeout": "PT3M",
+      "batchSize": 5,
+      "degreeOfParallelism": null,
+      "authResourceId": null,
+      "inputs": [
+        {
+          "name": "metadata_storage_path",
+          "source": "/document/metadata_storage_path"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ExtractedSummary",
+          "targetName": "ExtractedSummary"
+        }
+      ],
+      "httpHeaders": {},
+      "authIdentity": null
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+      "name": "Chunk Split",
+      "description": "split the content into chunks of max 2048 chars ready for vectorization",
+      "context": "/document",
+      "defaultLanguageCode": "en",
+      "textSplitMode": "pages",
+      "maximumPageLength": 2048,
+      "pageOverlapLength": 25,
+      "maximumPagesToTake": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/ExtractedContent"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "textItems",
+          "targetName": "chunks"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+      "name": "Embeddings generation",
+      "description": "Azure OpenAI Embedding Skill",
+      "context": "/document/chunks/*",
+      "resourceUri": "https://kmunlvr7-openai.openai.azure.com",
+      "apiKey": "<redacted>",
+      "deploymentId": "akm-embeddings",
+      "dimensions": 1536,
+      "modelName": "text-embedding-ada-002",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/chunks/*"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "embedding",
+          "targetName": "vector"
+        }
+      ],
+      "authIdentity": null
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Util.ShaperSkill",
+      "name": "Parent Shaper",
+      "description": "Put information about the parent document if current is embedded",
+      "context": "/document",
+      "inputs": [
+        {
+          "name": "key",
+          "source": "/document/parentkey"
+        },
+        {
+          "name": "id",
+          "source": "/document/parentid"
+        },
+        {
+          "name": "url",
+          "source": "/document/parenturl"
+        },
+        {
+          "name": "filename",
+          "source": "/document/parentfilename"
+        },
+        {
+          "name": "content_group",
+          "source": "/document/parentcontentgroup"
+        },
+        {
+          "name": "document_embedded",
+          "source": "/document/parentdocumentembedded"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "targetName": "parent_metadata"
+        }
+      ]
+    }
+  ],
+  "cognitiveServices": {
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
+    "description": "/subscriptions/Visual Studio Enterprise Subscription",
+    "key": null
+  },
+  "knowledgeStore": null,
+  "indexProjections": {
+    "selectors": [
+      {
+        "targetIndexName": "scij-index",
+        "parentKeyFieldName": "parent_id",
+        "sourceContext": "/document/chunks/*",
+        "mappings": [
+          {
+            "name": "chunk",
+            "source": "/document/chunks/*",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "vector",
+            "source": "/document/chunks/*/vector",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "metadata_storage_name",
+            "source": "/document/metadata_storage_name",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "case_title",
+            "source": "/document/curatedMetaData/CaseTitle",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "case_number",
+            "source": "/document/curatedMetaData/CaseNumber",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "disposal_nature",
+            "source": "/document/curatedMetaData/DisposalNature",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "direction_issue",
+            "source": "/document/curatedMetaData/DirectionIssue",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "citation",
+            "source": "/document/curatedMetaData/Citation",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "judges",
+            "source": "/document/curatedMetaData/Judges",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "issue_for_consideration",
+            "source": "/document/curatedMetaData/IssueForConsideration",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "head_notes",
+            "source": "/document/curatedMetaData/Headnotes",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "decision_date",
+            "source": "/document/curatedMetaData/DecisionDate",
+            "sourceContext": null,
+            "inputs": []
+          },
+          {
+            "name": "metadata_storage_path",
+            "source": "/document/metadata_storage_path",
+            "sourceContext": null,
+            "inputs": []
+          }
+        ]
+      }
+    ],
+    "parameters": {}
+  },
+  "encryptionKey": null
+}

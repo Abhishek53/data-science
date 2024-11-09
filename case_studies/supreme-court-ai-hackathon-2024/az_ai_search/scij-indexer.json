@@ -1,0 +1,147 @@
+{
+  "name": "scij-indexer",
+  "description": null,
+  "dataSourceName": "scij-documents",
+  "skillsetName": "scij-skillsets",
+  "targetIndexName": "scij-index",
+  "disabled": null,
+  "schedule": null,
+  "parameters": {
+    "batchSize": 5,
+    "maxFailedItems": -1,
+    "maxFailedItemsPerBatch": -1,
+    "base64EncodeKeys": null,
+    "configuration": {
+      "dataToExtract": "allMetadata",
+      "imageAction": "none",
+      "allowSkillsetToReadFileData": false,
+      "failOnUnsupportedContentType": false,
+      "failOnUnprocessableDocument": false,
+      "indexStorageMetadataOnlyForOversizedDocuments": true,
+      "excludedFileNameExtensions": ".jpg,.jpeg,.png,.bmp,.tiff,.tif,.gif,.zip,.gz,.7z,.rar,.sitx,.db,.bat,.csv,.yxmd,.bak,.pbix,.pbiviz,.flv, .mxf, .gxf, .ts, .ps, .3gp, .3gpp, .mpg, .wmv, .asf, .avi, .mp4, .m4a, .m4v, .isma, .ismv, .dvr-ms, .mkv, .wav, .mov",
+      "executionEnvironment": "standard"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "metadata_storage_path",
+      "targetFieldName": "index_key",
+      "mappingFunction": {
+        "name": "base64Encode",
+        "parameters": null
+      }
+    },
+    {
+      "sourceFieldName": "metadata_storage_path",
+      "targetFieldName": "document_id",
+      "mappingFunction": {
+        "name": "base64Encode",
+        "parameters": {
+          "useHttpServerUtilityUrlTokenEncode": false
+        }
+      }
+    },
+    {
+      "sourceFieldName": "metadata_storage_path",
+      "targetFieldName": "metadata_storage_path",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_storage_path",
+      "targetFieldName": "document_url",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_storage_name",
+      "targetFieldName": "metadata_storage_name",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_storage_name",
+      "targetFieldName": "document_filename",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_storage_last_modified",
+      "targetFieldName": "source_last_modified",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_creation_date",
+      "targetFieldName": "creation_date",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_last_modified",
+      "targetFieldName": "last_modified",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_description",
+      "targetFieldName": "description",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_storage_content_type",
+      "targetFieldName": "content_type",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_slide_count",
+      "targetFieldName": "slide_count",
+      "mappingFunction": null
+    }
+  ],
+  "outputFieldMappings": [
+    {
+      "sourceFieldName": "/document/parent_metadata",
+      "targetFieldName": "parent"
+    },
+    {
+      "sourceFieldName": "/document/language",
+      "targetFieldName": "language"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/CaseTitle",
+      "targetFieldName": "case_title"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/Citation",
+      "targetFieldName": "citation"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/Judges",
+      "targetFieldName": "judges"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/IssueForConsideration",
+      "targetFieldName": "issue_for_consideration"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/Headnotes",
+      "targetFieldName": "head_notes"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/DecisionDate",
+      "targetFieldName": "decision_date"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/CaseNumber",
+      "targetFieldName": "case_number"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/DisposalNature",
+      "targetFieldName": "disposal_nature"
+    },
+    {
+      "sourceFieldName": "/document/curatedMetaData/DirectionIssue",
+      "targetFieldName": "direction_issue"
+    },
+    {
+      "sourceFieldName": "/document/ExtractedSummary",
+      "targetFieldName": "judgement_summary"
+    }
+  ],
+  "cache": null,
+  "encryptionKey": null
+}
