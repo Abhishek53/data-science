@@ -37,10 +37,10 @@ The solution architecture consists of multiple modules designed for preprocessin
 
 ### Key Features
 - **Q&A in Regional Languages**: Support for generating responses in scheduled languages.
-![Cross language QNA](docs/result3.png)
+![QNA in regional language](docs/result-2.png)
 
 - **Cross-Language Q&A**: Cross-linguistic interaction, such as asking questions in English and receiving answers in regional languages.
-![QNA in regional language](docs/result-2.png)
+![Cross language QNA](docs/result3.png)
 ![QNA in english](docs/result1.png)
 
 - **Summary Generation**: Summarization capabilities in both English and regional languages.
@@ -53,7 +53,7 @@ To set up the project locally:
 
 ```bash
 # Clone the repository
-git clone https://github.com/username/project-name.git
+git clone https://github.com/Abhishek53/data-science.git
 
 # Navigate to the project directory
 cd case_studies/supreme-court-hackathon-2024
